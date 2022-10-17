@@ -17,7 +17,8 @@ const stringState = createStore<StringState>({
         append(state, value: string){
             state.data += value
         }
-    }
+    },
+    strict: process.env.NODE_ENV !== 'production'
 })
 
 export const useString = () => useBasicStore(key)
