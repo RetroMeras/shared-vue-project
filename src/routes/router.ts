@@ -6,7 +6,7 @@ import NotFound from './NotFound.vue'
 const routes = [
     {path: '/', name: 'main', component: Main, alias: ["/main"]},
     {path: '/second', name: 'second', component: Second},
-    {path: '/:uri(.*)*', name: 'second', component: NotFound},
+    {path: '/:uri(.*)*', name: 'notFound', component: NotFound},
 ]
 
 const router = createRouter({
