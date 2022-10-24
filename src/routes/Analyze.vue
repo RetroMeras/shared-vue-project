@@ -1,5 +1,8 @@
 <template>
-  <div>Records count {{ records.length }}</div>
+  <el-button type="danger" v-if="records.length == 0" @click="router.push('/')">
+    Вернуться назад
+  </el-button>
+  <div v-else>Records count {{ records.length }}</div>
   <div class="grid grid-cols-3 gap-4">
     <div
       v-for="(item, index) in stats"
@@ -14,9 +17,12 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { IRecord } from "../custom-types/record";
 import { IWord } from "../custom-types/record";
 import { useRecords } from "../store/records";
+
+const router = useRouter();
 
 const { state: recordsState, dispatch } = useRecords();
 const records = recordsState.records;
