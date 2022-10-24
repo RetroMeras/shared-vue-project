@@ -77,21 +77,21 @@ const handleTime = () => {
 
 const words: IWord[] = [];
 
-const new_word = {
+const new_word = () => ({
   startTime: new Date().getTime(),
   endTime: 0,
   time: 0,
   word: "",
   wpm: 0,
-};
+});
 
 const handleTyping = (event: KeyboardEvent) => {
-  if (event.ctrlKey) {
+  if (event.ctrlKey || finished) {
     return;
   }
   event.preventDefault();
   if (words.length == 0) {
-    words.push(new_word);
+    words.push(new_word());
   }
   let index = words.length - 1;
   switch (event.key) {
@@ -117,13 +117,13 @@ const handleTyping = (event: KeyboardEvent) => {
         time,
         wpm: countWPM(words[index].word.length, time / 60 / 1000),
       };
-      words.push(new_word);
+      words.push(new_word());
       typed.value = replaceAt(typed.value, current_index, ` ${cursor}`);
       mask[current_index] = text[current_index] === " ";
       current_index++;
       break;
     default:
-      if (event.key.length != 1 || current_index == text.length || finished) {
+      if (event.key.length != 1 || current_index == text.length) {
         break;
       }
       started = true;
