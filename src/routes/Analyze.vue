@@ -27,8 +27,10 @@ let stats = ref([] as any[]);
 const roundTwo = (n: number): number => {
   return Math.round(n * 100) / 100;
 };
-console.log(records.slice(Math.max(0, records.length - 10)));
 const createStats = () => {
+  if (records.length == 0) {
+    return;
+  }
   const words = records.reduce(
     (words, record) => words.concat(record.words),
     [] as IWord[]

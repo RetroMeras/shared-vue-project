@@ -18,8 +18,8 @@ import { ref } from "vue";
 import { IWord, IRecord } from "../custom-types/record";
 import { useRecords } from "../store/records";
 import { replaceAt } from "../utils/replaceAt";
-import { countWPM } from "../utils/wpm"
-import {generateText} from '../utils/generateText'
+import { countWPM } from "../utils/wpm";
+import { generateText } from "../utils/generateText";
 
 const totalTime = 0.5; // minutes
 
@@ -45,19 +45,19 @@ const handleTime = () => {
       if (!added) {
         added = true;
         let new_words = words;
-        if(words.length > 0){
+        if (words.length > 0) {
           const index = words.length - 1;
-          if(words[index].word.length != 0){
+          if (words[index].word.length != 0) {
             const endTime = new Date().getTime();
             const time = endTime - words[index].startTime;
             new_words[index] = {
               ...words[index],
               endTime,
               time,
-              wpm: countWPM(words[index].word.length, time / 60 / 1000)
-            }
-          }else{
-            new_words = new_words.slice(0, -1)
+              wpm: countWPM(words[index].word.length, time / 60 / 1000),
+            };
+          } else {
+            new_words = new_words.slice(0, -1);
           }
         }
 
@@ -66,7 +66,7 @@ const handleTime = () => {
           wpm: wpm.value,
           date: new Date().getTime(),
           words: new_words,
-          accuracy: current_index/total_types*100,
+          accuracy: (current_index / total_types) * 100,
           misspelled: [],
         } as IRecord);
       }
@@ -86,7 +86,7 @@ const new_word = {
 };
 
 const handleTyping = (event: KeyboardEvent) => {
-  if(event.ctrlKey){
+  if (event.ctrlKey) {
     return;
   }
   event.preventDefault();
@@ -123,15 +123,12 @@ const handleTyping = (event: KeyboardEvent) => {
       current_index++;
       break;
     default:
-      if (
-        event.key.length != 1 ||
-        current_index == text.length ||
-        finished
-      ) {
+      if (event.key.length != 1 || current_index == text.length || finished) {
         break;
       }
       started = true;
-      typed.value = replaceAt(typed.value,
+      typed.value = replaceAt(
+        typed.value,
         current_index,
         `${event.key}${cursor}`
       );
