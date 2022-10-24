@@ -43,11 +43,24 @@ const handleTime = () => {
       started = false;
       if (!added) {
         added = true;
+        let new_words = words;
+        if(words.length > 0){
+          const index = words.length - 1;
+          const endTime = new Date().getTime();
+          const time = endTime - words[index].startTime;
+          words[index] = {
+            ...words[index],
+            endTime,
+            time,
+            wpm: countWPM(words[index].word.length, time / 60 / 1000)
+          }
+        }
+
         store.dispatch("saveRecord", {
           id: "",
           wpm: wpm.value,
           date: new Date().getTime(),
-          words: words,
+          words: new_words,
           accuracy: 0,
           misspelled: [],
         } as IRecord);
