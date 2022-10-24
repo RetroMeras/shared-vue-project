@@ -31,6 +31,7 @@ let started = false;
 let finished = false;
 let added = false;
 let current_index = 0;
+let total_types = 0;
 
 const timeLeft = ref(totalTime * 60 * 1000);
 const wpm = ref(0);
@@ -46,13 +47,17 @@ const handleTime = () => {
         let new_words = words;
         if(words.length > 0){
           const index = words.length - 1;
-          const endTime = new Date().getTime();
-          const time = endTime - words[index].startTime;
-          words[index] = {
-            ...words[index],
-            endTime,
-            time,
-            wpm: countWPM(words[index].word.length, time / 60 / 1000)
+          if(words[index].word.length != 0){
+            const endTime = new Date().getTime();
+            const time = endTime - words[index].startTime;
+            new_words[index] = {
+              ...words[index],
+              endTime,
+              time,
+              wpm: countWPM(words[index].word.length, time / 60 / 1000)
+            }
+          }else{
+            new_words = new_words.slice(0, -1)
           }
         }
 
@@ -61,7 +66,7 @@ const handleTime = () => {
           wpm: wpm.value,
           date: new Date().getTime(),
           words: new_words,
-          accuracy: 0,
+          accuracy: current_index/total_types*100,
           misspelled: [],
         } as IRecord);
       }
@@ -136,6 +141,7 @@ const handleTyping = (event: KeyboardEvent) => {
       };
       mask[current_index] = text[current_index] === event.key;
       current_index++;
+      total_types++;
       break;
   }
 };
