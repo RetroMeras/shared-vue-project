@@ -17,6 +17,8 @@
 import { ref } from "vue";
 import { IWord, IRecord } from "../custom-types/record";
 import { useRecords } from "../store/records";
+import { replaceAt } from "../utils/replaceAt";
+import { countWPM } from "../utils/wpm"
 
 const generateText = () => {
   const text =
@@ -26,17 +28,7 @@ const generateText = () => {
     mask: new Array(text.length).fill(true),
   };
 };
-// @ts-ignore
-String.prototype.replaceAt = function (
-  index: number,
-  replacement: string
-): string {
-  return (
-    this.substring(0, index) +
-    replacement +
-    this.substring(index + replacement.length)
-  );
-};
+
 
 const totalTime = 0.5; // minutes
 
@@ -44,8 +36,8 @@ const store = useRecords();
 const cursor = "_";
 const { text, mask } = generateText();
 const typed = ref(cursor + new Array(text.length - 1).join(" "));
-const started = ref(false);
-const finished = ref(false);
+let started = false;
+let finished = false;
 let added = false;
 let current_index = 0;
 
@@ -56,7 +48,8 @@ const handleTime = () => {
   if (started) {
     timeLeft.value = Math.max(0, timeLeft.value - 100);
     if (timeLeft.value == 0) {
-      finished.value = true;
+      finished = true;
+      started = false;
       if (!added) {
         added = true;
         store.dispatch("saveRecord", {
@@ -71,10 +64,6 @@ const handleTime = () => {
     }
     wpm.value = countWPM(current_index, totalTime - timeLeft.value / 60000);
   }
-};
-
-const countWPM = (index: number, time: number): number => {
-  return index / 5 / time;
 };
 
 const words: IWord[] = [];
@@ -95,7 +84,7 @@ const handleTyping = (event: KeyboardEvent) => {
   let index = words.length - 1;
   switch (event.key) {
     case "Backspace":
-      typed.value = typed.value.replaceAt(current_index - 1, `${cursor} `);
+      typed.value = replaceAt(typed.value, current_index - 1, `${cursor} `);
       if (words[index].word.length == 0 && words.length > 1) {
         words.pop();
         index--;
@@ -114,10 +103,10 @@ const handleTyping = (event: KeyboardEvent) => {
         ...words[index],
         endTime,
         time,
-        wpm: (words[index].word.length / time) * 60 * 1000,
+        wpm: countWPM(words[index].word.length, time / 60 / 1000),
       };
       words.push(new_word);
-      typed.value = typed.value.replaceAt(current_index, ` ${cursor}`);
+      typed.value = replaceAt(typed.value, current_index, ` ${cursor}`);
       mask[current_index] = text[current_index] === " ";
       current_index++;
       break;
@@ -125,12 +114,12 @@ const handleTyping = (event: KeyboardEvent) => {
       if (
         event.key.length != 1 ||
         current_index == text.length ||
-        finished.value
+        finished
       ) {
         break;
       }
-      started.value = true;
-      typed.value = typed.value.replaceAt(
+      started = true;
+      typed.value = replaceAt(typed.value,
         current_index,
         `${event.key}${cursor}`
       );
