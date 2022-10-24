@@ -15,6 +15,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { IRecord } from "../custom-types/record";
+import { IWord } from "../custom-types/record";
 import { useRecords } from "../store/records";
 
 const { state: recordsState, dispatch } = useRecords();
@@ -28,6 +29,18 @@ const roundTwo = (n: number): number => {
 };
 console.log(records.slice(Math.max(0, records.length - 10)));
 const createStats = () => {
+  const words = records.reduce(
+    (words, record) => words.concat(record.words),
+    [] as IWord[]
+  );
+  console.log(words);
+
+  const records10 = records.slice(Math.max(0, records.length - 10));
+  const words10 = records10.reduce(
+    (words, record) => words.concat(record.words),
+    [] as IWord[]
+  );
+
   stats.value = [
     {
       label: "Average all time",
@@ -39,9 +52,7 @@ const createStats = () => {
     {
       label: "Average last 10",
       value: roundTwo(
-        records
-          .slice(Math.max(0, records.length - 10))
-          .reduce((sum: number, item: IRecord) => (sum += item.wpm), 0) /
+        records10.reduce((sum: number, item: IRecord) => (sum += item.wpm), 0) /
           Math.min(10, Math.max(records.length, 1))
       ),
     },
@@ -51,6 +62,22 @@ const createStats = () => {
       value: roundTwo(
         records.reduce((mx, item) => (mx = Math.max(mx, item.wpm)), 0)
       ),
+    },
+
+    {
+      label: "The slowest word",
+      value: words.reduce(
+        (sw, item) => (sw = sw.wpm < item.wpm ? sw : item),
+        words[0]
+      ).word,
+    },
+
+    {
+      label: "The slowest word in last 10 attempts",
+      value: words10.reduce(
+        (sw10, item) => (sw10 = sw10.wpm < item.wpm ? sw10 : item),
+        words10[0]
+      ).word,
     },
   ];
 };
