@@ -4,7 +4,7 @@
       class="flex items-center justify-end fixed top-0 gap-4 h-14 w-full z-50 bg-pink-300 p-5"
     >
       <router-link
-        class="text-white text-lg hover:text-xl"
+        class="text-white text-lg"
         v-for="(link, index) in links"
         :key="index"
         :to="link.href"
