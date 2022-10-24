@@ -19,22 +19,13 @@ import { IWord, IRecord } from "../custom-types/record";
 import { useRecords } from "../store/records";
 import { replaceAt } from "../utils/replaceAt";
 import { countWPM } from "../utils/wpm"
-
-const generateText = () => {
-  const text =
-    "Amet minim sunt laboris duis ipsum nisi sint tempor mollit anim nostrud. Esse nisi magna deserunt laborum amet mollit cupidatat. Non laborum voluptate commodo nisi. ";
-  return {
-    text: new Array(3).join(text),
-    mask: new Array(text.length).fill(true),
-  };
-};
-
+import {generateText} from '../utils/generateText'
 
 const totalTime = 0.5; // minutes
 
 const store = useRecords();
 const cursor = "_";
-const { text, mask } = generateText();
+const { text, mask } = generateText(50);
 const typed = ref(cursor + new Array(text.length - 1).join(" "));
 let started = false;
 let finished = false;
@@ -45,7 +36,7 @@ const timeLeft = ref(totalTime * 60 * 1000);
 const wpm = ref(0);
 
 const handleTime = () => {
-  if (started) {
+  if (started && !finished) {
     timeLeft.value = Math.max(0, timeLeft.value - 100);
     if (timeLeft.value == 0) {
       finished = true;
@@ -62,7 +53,7 @@ const handleTime = () => {
         } as IRecord);
       }
     }
-    wpm.value = countWPM(current_index, totalTime - timeLeft.value / 60000);
+    wpm.value = countWPM(current_index, totalTime - timeLeft.value / 60 / 1000);
   }
 };
 
@@ -77,6 +68,9 @@ const new_word = {
 };
 
 const handleTyping = (event: KeyboardEvent) => {
+  if(event.ctrlKey){
+    return;
+  }
   event.preventDefault();
   if (words.length == 0) {
     words.push(new_word);
