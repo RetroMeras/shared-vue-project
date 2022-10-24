@@ -121,6 +121,7 @@ const handleTyping = (event: KeyboardEvent) => {
       typed.value = replaceAt(typed.value, current_index, ` ${cursor}`);
       mask[current_index] = text[current_index] === " ";
       current_index++;
+      total_types++;
       break;
     default:
       if (
